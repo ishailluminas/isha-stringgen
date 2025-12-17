@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StringGen | 萌萌哒字符串生成器</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=ZCOOL+KuaiLe&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <!-- 头部 -->
+        <header class="header">
+            <div class="header-content">
+                <div class="header-brand">
+                    <h1>StringGen</h1>
+                    <p class="subtitle">萌萌哒字符串生成服务</p>
+                </div>
+                <div class="header-actions">
+                     <button id="config-btn" class="btn btn-ghost">
+                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+                        配置
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- 主内容区 -->
+        <div class="main-content">
+            <!-- 左侧：生成器 -->
+            <div class="generator-section">
+                <div class="card">
+                    <h2 class="section-title">
+                        <svg class="icon icon-lg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"></path></svg>
+                        生成字符串
+                    </h2>
+
+                    <!-- 格式选择 -->
+                    <div class="form-group">
+                        <label for="format-select">格式类型</label>
+                        <select id="format-select" class="form-control">
+                            <option value="uuid_hex">UUID 十六进制 (32位)</option>
+                            <option value="uuid">UUID 标准格式</option>
+                            <option value="hex">十六进制</option>
+                            <option value="base64url">Base64 URL安全</option>
+                            <option value="alnum">字母数字</option>
+                            <option value="jwt">JWT 风格</option>
+                        </select>
+                        <small id="format-description" class="form-text">32位十六进制 UUID（无连字符）</small>
+                    </div>
+
+                    <!-- 长度设置 -->
+                    <div class="form-group" id="length-group">
+                        <label for="length-input">长度（不含前缀）</label>
+                        <input type="number" id="length-input" class="form-control" value="32" min="1" max="256">
+                        <small class="form-text">范围: 1-256</small>
+                    </div>
+
+                    <!-- 生成按钮 -->
+                    <button id="generate-btn" class="btn btn-primary btn-large btn-pixel">
+                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                        生成随机字符串
+                    </button>
+
+                    <!-- 生成结果 -->
+                    <div id="result-section" class="result-section" style="display: none;">
+                        <label>生成结果</label>
+                        <div class="result-display">
+                            <code id="generated-value"></code>
+                            <button id="copy-btn" class="btn btn-icon" title="复制">
+                                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- 保存表单 -->
+                    <div id="save-section" style="display: none;">
+                        <div class="form-group">
+                            <label for="name-input">自定义名称</label>
+                            <input type="text" id="name-input" class="form-control" placeholder="例如: my_api_key">
+                        </div>
+                        <button id="save-btn" class="btn btn-success">
+                            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>
+                            保存
+                        </button>
+                    </div>
+
+                    <!-- 分隔线 -->
+                    <div class="divider"></div>
+
+                    <!-- 手动输入 -->
+                    <h3 class="section-subtitle">
+                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"></path></svg>
+                        手动输入
+                    </h3>
+                    <div class="form-group">
+                        <label for="manual-name">名称</label>
+                        <input type="text" id="manual-name" class="form-control" placeholder="例如: imported_key">
+                    </div>
+                    <div class="form-group">
+                        <label for="manual-value">字符串值</label>
+                        <textarea id="manual-value" class="form-control" rows="3" placeholder="粘贴或输入字符串..."></textarea>
+                        <small class="form-text">可以包含或不包含前缀</small>
+                    </div>
+                    <div class="form-group">
+                        <label for="manual-format">格式类型</label>
+                        <select id="manual-format" class="form-control">
+                            <option value="uuid_hex">UUID 十六进制</option>
+                            <option value="uuid">UUID 标准格式</option>
+                            <option value="hex">十六进制</option>
+                            <option value="base64url">Base64 URL安全</option>
+                            <option value="alnum">字母数字</option>
+                            <option value="jwt">JWT 风格</option>
+                        </select>
+                    </div>
+                    <button id="manual-save-btn" class="btn btn-success">
+                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>
+                        保存手动输入
+                    </button>
+                </div>
+            </div>
+
+            <!-- 右侧：列表管理 -->
+            <div class="list-section">
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="section-title">
+                            <svg class="icon icon-lg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="21 8 21 21 3 21 3 8"></polyline><rect x="1" y="3" width="22" height="5"></rect><line x1="10" y1="12" x2="14" y2="12"></line></svg>
+                            已保存的字符串
+                        </h2>
+                        <div class="header-actions">
+                            <button id="export-btn" class="btn btn-outline btn-small">
+                                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                                导出
+                            </button>
+                            <button id="refresh-btn" class="btn btn-outline btn-small">
+                                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>
+                                刷新
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- 搜索框 -->
+                    <div class="form-group">
+                        <input type="text" id="search-input" class="form-control" placeholder="搜索名称或值...">
+                    </div>
+
+                    <!-- 统计信息 -->
+                    <div id="statistics" class="statistics">
+                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 6px;"><rect x="18" y="3" width="4" height="18"></rect><rect x="10" y="8" width="4" height="13"></rect><rect x="2" y="13" width="4" height="8"></rect></svg>
+                        加载中...
+                    </div>
+
+                    <!-- 列表 -->
+                    <div id="entries-list" class="entries-list">
+                        <div class="loading">加载中...</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 配置模态框 -->
+    <div id="config-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>
+                    <svg class="icon icon-lg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+                    系统配置
+                </h3>
+                <button class="modal-close" id="config-modal-close">
+                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="config-prefix">字符串前缀</label>
+                    <input type="text" id="config-prefix" class="form-control" placeholder="例如: custom-">
+                    <small class="form-text">建议以 - 结尾</small>
+                </div>
+                <div class="form-group">
+                    <label for="config-host">服务器地址</label>
+                    <input type="text" id="config-host" class="form-control" placeholder="127.0.0.1">
+                    <small class="form-text">修改后需要重启服务</small>
+                </div>
+                <div class="form-group">
+                    <label for="config-port">服务器端口</label>
+                    <input type="number" id="config-port" class="form-control" placeholder="5000" min="1" max="65535">
+                    <small class="form-text">修改后需要重启服务</small>
+                </div>
+                <div class="alert alert-info">
+                    💡 配置将保存到 .env 文件，修改端口和地址后需要重启服务才能生效
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button id="config-cancel-btn" class="btn btn-secondary">取消</button>
+                <button id="config-save-btn" class="btn btn-primary">保存配置</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 编辑模态框 -->
+    <div id="edit-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>
+                    <svg class="icon icon-lg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                    编辑字符串
+                </h3>
+                <button class="modal-close" id="edit-modal-close">
+                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="edit-name">名称</label>
+                    <input type="text" id="edit-name" class="form-control">
+                </div>
+                <div class="form-group">
+                    <label for="edit-value">值</label>
+                    <textarea id="edit-value" class="form-control" rows="3"></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button id="edit-cancel-btn" class="btn btn-secondary">取消</button>
+                <button id="edit-save-btn" class="btn btn-primary">保存</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast 通知 -->
+    <div id="toast" class="toast"></div>
+
+    <script src="{{ url_for('static', filename='app.js') }}"></script>
+</body>
+</html>
