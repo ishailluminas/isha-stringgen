@@ -48,3 +48,6 @@ Thumbs.db
 
 # Serena 代码分析工具
 .serena/
+
+#claude
+.claude/
